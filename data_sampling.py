@@ -111,7 +111,7 @@ def sample_and_merge(jsonfile_list, ratio):
 
 def json2csv (jsonfile_list, ratio):
     df = sample_and_merge(jsonfile_list, ratio)
-    result = pd.to_csv("result.csv", index=False, encoding="utf-8") 
+    result = pd.to_csv("result.csv", index=False, encoding="utf-8-sig") 
 
 
 json_list = [
