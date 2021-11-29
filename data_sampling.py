@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 import numpy as np
 from pprint import pprint 
+import gc
 
 file_list = ['living.json']
 
@@ -25,6 +26,11 @@ def json2df (file):
   df2 = pd.json_normalize(jdata['data'], record_path=['header', 'participantsInfo'],  meta= [['header', 'dialogueInfo', 'dialogueID']], errors='ignore')
   # join df1 and df2 where (df1.dialogueID == df2.dialogueID and df1.participantID == df2.participantID)
   df = pd.merge(left = df1 , right = df2, how = "left", on = ["header.dialogueInfo.dialogueID", 'participantID' ],sort=False)
+
+  del df1
+  gc.collect()
+  del df2
+  gc.collect()
 
   # rename column names
   # 열이름 너무 길어서 바꿈. P는 참가자, U는 메시지, D는 대화, T는 turn 으로 통일시킴. 맘에 안 들면 바꿔도 ok
@@ -48,6 +54,9 @@ def clean_df(df):
   df['index'] = df.index.to_numpy()
   s = df.groupby(df.index)['utterance'].apply(' '.join).to_frame()
   df = pd.merge(left = s.reset_index(), right = df[['P_gender','index']], how = "left", left_on=['index'], right_on= ['index'], sort=False).drop_duplicates().set_index('index').reset_index()
+
+  del s
+  gc.collect()
 
   return df
 
@@ -109,9 +118,9 @@ def sample_and_merge(jsonfile_list, ratio):
   return result
 
 
-def json2csv (jsonfile_list, ratio):
+def json2csv (jsonfile_list, ratio, output_file):
     df = sample_and_merge(jsonfile_list, ratio)
-    result = pd.to_csv("result.csv", index=False, encoding="utf-8-sig") 
+    result = df.to_csv(output_file, index=False, encoding="utf-8-sig") 
 
 
 json_list = [
@@ -126,5 +135,5 @@ json_list = [
             'work_job.json'
             ]
 
-sample_and_merge (json_list, 0.1)
-# json2csv(json_list, 0.2) 
+
+json2csv(json_list, 1, 'data_100.csv') 
