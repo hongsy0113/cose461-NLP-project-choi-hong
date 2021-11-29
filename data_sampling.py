@@ -9,8 +9,6 @@ import numpy as np
 from pprint import pprint 
 import gc
 
-file_list = ['living.json']
-
 # json file을 읽어오고 dataframe으로 변환하는 함수
 def json2df (file):
   with open(file, 'r', encoding='UTF8') as f:
